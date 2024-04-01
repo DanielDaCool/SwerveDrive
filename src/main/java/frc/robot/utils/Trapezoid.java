@@ -1,33 +1,44 @@
+
 package frc.robot.utils;
+import static frc.robot.Constants.*;
 
 public class Trapezoid {
-    private final double maxVelocity;
-    private final double acceleration;
-    private final double safeVelocity;
-    private final double endVelocity;
+    private double maxVel;
+    private double accel;
+    private double lastVel;
+    private double finishVel;
+    private double deltaVelocity;
 
-    public Trapezoid(double maxVelocity, double acceleration, double safeVelocity, double endVelocity) {
-        this.maxVelocity = maxVelocity;
-        this.acceleration = acceleration;
-        this.safeVelocity = safeVelocity;
-        this.endVelocity = endVelocity;
+
+    public Trapezoid(double maxVel, double accel, double finishVel){
+        this.accel = accel;
+        this.maxVel = maxVel;
+        this.finishVel = finishVel;
+        deltaVelocity = accel * 0.02;
     }
 
-    public double calculate(double remainingDistance, double currentVelocity) {
-        double accelTime = maxVelocity / acceleration;
-        double accelDistance = 0.5 * acceleration * Math.pow(accelTime, 2);
-        if (currentVelocity < maxVelocity && remainingDistance > accelDistance) {
-            // accelerate
-            return currentVelocity + acceleration * 0.02;
+    private double distanceToVelWithAccel(double currentVel, double targetVel){
+        double time = (targetVel - currentVel) / accel;
+        return (currentVel * time) + (0.5 * accel * time * time);
+    }
+    private double distanceWithoutAccel(double currentVel){
+        return currentVel * 0.02;
+    }
+
+    private boolean isAbleToDeAccel(double currentVel, double distanceLeft){
+        return (currentVel + deltaVelocity >= maxVel)
+        ? distanceLeft > distanceWithoutAccel(currentVel)
+        : distanceLeft > distanceToVelWithAccel(currentVel, currentVel + deltaVelocity);
+    }
+
+    public double calcVelocity(double currentVel, double distanceLeft){
+        lastVel = currentVel;
+        if(distanceLeft < 0) {
+            return -calcVelocity(Math.abs(distanceLeft), currentVel);
         }
-        else if (remainingDistance > accelDistance) {
-            // keep velocity
-            return maxVelocity;
-        }
-        else if (remainingDistance <= accelDistance) {
-            // deccelerate
-            return Math.max(Math.max(currentVelocity - acceleration * 0.02, safeVelocity), endVelocity);
-        }
-        return endVelocity;
+
+        return (isAbleToDeAccel(currentVel, distanceLeft))
+        ? Math.min(currentVel + deltaVelocity, maxVel)
+        : Math.max(currentVel - deltaVelocity, finishVel);
     }
 }

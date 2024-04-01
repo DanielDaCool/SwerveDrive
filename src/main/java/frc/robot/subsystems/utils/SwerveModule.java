@@ -93,4 +93,8 @@ public class SwerveModule {
         double difference = getAngleDifference(getAngle().getDegrees(), targetAngle);
         return angleMotor.getDistance() + (difference * PULSES_PER_DEGREE);
     }
+
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(getVelocity(), getAngle());
+    }
 }

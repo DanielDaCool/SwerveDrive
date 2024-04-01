@@ -71,6 +71,18 @@ public class Chassis extends SubsystemBase {
         return Arrays.stream(modules).map(SwerveModule::getPosition).toArray(SwerveModulePosition[]::new);
     }
 
+    public ChassisSpeeds getChassisSpeeds() {
+        return KINEMATICS.toChassisSpeeds(getModuleStates());
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] res = new SwerveModuleState[modules.length];
+        for (int i = 0; i < modules.length; i++) {
+          res[i] = modules[i].getState();
+        }
+        return res;
+      }
+
     @Override
     public void periodic() {
         Arrays.stream(modules).forEach(SwerveModule::update);
