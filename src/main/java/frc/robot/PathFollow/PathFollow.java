@@ -189,6 +189,9 @@ public class PathFollow extends CommandBase {
       segments.add(corners[corners.length - 1].getCtoCurveLeg());
       
     }
+    for (Segment segment : segments) {
+      if(segment.getLength() < PATH_MIN_DISTANCE_SEGMENT) segments.remove(segment);
+    }
   }
    
 
@@ -235,16 +238,25 @@ public class PathFollow extends CommandBase {
   private boolean isCurrentSegmentLeg(){
     return segments.get(segmentIndex) instanceof Leg;
   }
+  private boolean isInPoint(Pose2d pose, pathPoint point){
+    boolean isLastIndex = (pointIndex == points.length - 1);
+    return (isLastIndex) ? false : Math.abs(pose.getX() - point.getX()) <= 0.5 && Math.abs(pose.getY() - point.getY()) <= 0.5;
+  }
 
 
 
 
   int pointIndex = 0;
+  
   @Override
   public void execute() {
     
     
     chassisPose = chassis.getPose();
+    System.out.println("INDEX: " + pointIndex);
+    System.out.println(isInPoint(chassisPose, points[pointIndex]));
+
+    if(isInPoint(chassisPose, points[pointIndex])) pointIndex++;
 
 
     // current velocity vector
@@ -260,17 +272,18 @@ public class PathFollow extends CommandBase {
 
     //update total left when finished current segment
     if(isFinishedSegment()){
-      //if(isCurrentSegmentLeg()) pointIndex++;
+      
       totalLeft -= segments.get(segmentIndex).getLength();
       
       
       
       //update segment index
-      if (!isLastSegment(segmentIndex) || segments.get(segmentIndex).getLength() <= 0.15){
+      if (!isLastSegment(segmentIndex)){
         
             
-
-        driveTrapezoid = new Trapezoid(points[pointIndex].getVelocity(), accel, points[pointIndex+1].getVelocity());
+        if(pointIndex != points.length - 1) driveTrapezoid = new Trapezoid(points[pointIndex].getVelocity(), accel, points[pointIndex+1].getVelocity());
+        else driveTrapezoid = new Trapezoid(points[pointIndex].getVelocity(), accel, finishVel);
+        
         segmentIndex++;
       }
       else driveTrapezoid = new Trapezoid(points[pointIndex].getVelocity(), accel, finishVel);

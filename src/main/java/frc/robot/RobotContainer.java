@@ -39,7 +39,10 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return new PathFollow(new pathPoint[]{ new pathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), 0, 4),
-      new pathPoint(new Translation2d(2, 2), Rotation2d.fromDegrees(75), 2, 1),
+      new pathPoint(new Translation2d(2, 2), Rotation2d.fromDegrees(20), 0.5, 1),
+      new pathPoint(new Translation2d(3, 1), Rotation2d.fromDegrees(40), 0.5, 1),
+      new pathPoint(new Translation2d(5, 3), Rotation2d.fromDegrees(90), 2, 1),
+      new pathPoint(new Translation2d(8, 3), Rotation2d.fromDegrees(150), 2, 1),
     });
   }
 }
