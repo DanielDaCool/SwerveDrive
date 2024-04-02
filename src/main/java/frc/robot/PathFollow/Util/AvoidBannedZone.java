@@ -13,14 +13,13 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class AvoidBannedZone {
-    private static RectanglePos[] bannedPos = {new RectanglePos(new Translation2d(1.5, 1.5), new Translation2d(1, 1))};
+    private static RectanglePos[] bannedPos = {new RectanglePos(new Translation2d(3, 2), new Translation2d(1, 0))};
     private static RectanglePos intersectionPos = null;
     private static Segment currentSegment;
 
     
 
     private static boolean isInsideArc(Arc arc){
-        intersectionPos = null;
         for (Translation2d point : arc.getPoints()) {
             for(RectanglePos pos : bannedPos){
                 intersectionPos = pos;
@@ -31,14 +30,15 @@ public class AvoidBannedZone {
         return false;
     }
     private static boolean isInsideLeg(Leg leg){
-        intersectionPos = null;
         Translation2d p1 = leg.p1;
         Translation2d p2 = leg.p2;
         for(RectanglePos pos : bannedPos){
+           
             for(Translation2d[] line : pos.getLinesPoints()){
                 
+                
                 if(isIntersecting(p1, p2, line[0], line[1])){
-                    System.out.println("Enter");
+                   
                     intersectionPos = pos;
                     return true;
                 } 
@@ -54,7 +54,7 @@ public class AvoidBannedZone {
         currentSegment = segment;
         
         
-        if(intersectionPos == null) return new Segment[] {segment};
+        
         if(isLeg){
             newPoints.add(new pathPoint(segment.p1, Rotation2d.fromDegrees(0), 0, PATH_MAX_VELOCITY_AVOID));
             if(isInsideLeg((Leg) segment)){
@@ -69,6 +69,7 @@ public class AvoidBannedZone {
             newPoints.add(new pathPoint(segment.p2, Rotation2d.fromDegrees(0), PATH_MAX_VELOCITY_AVOID));
             if(isInsideArc((Arc)segment)) SmartDashboard.putBoolean("isValidSegment", false);
         }
+        if(intersectionPos == null) return new Segment[] {segment};
 
         
 
@@ -97,7 +98,9 @@ public class AvoidBannedZone {
         Translation2d[] fixingPoints = {topLpoint, topRpoint, bottomLpoint, bottomRpoint};
 
         Translation2d firstPoint = calcClosetPoint(fixingPoints, pose);
+        System.out.println("FIRST POINT: " + firstPoint);
         Translation2d secondPoint = calcClosetPoint(points.get(firstPoint), currentSegment.p2);
+        System.out.println("SECOND POINT: " + secondPoint);
 
         return new Pair<Translation2d,Translation2d>(firstPoint, secondPoint);
 

@@ -152,8 +152,7 @@ public class PathFollow extends CommandBase {
   private void initSegments(){
     if (points.length < 3) {
       for(Segment segment : AvoidBannedZone.fixPoint(new Leg(points[0].getTranslation(), points[1].getTranslation()), points[0].getTranslation())){
-        
-        System.out.println(segment);
+         
         segments.add(segment);
       }
       angles.add(points[points.length - 1].getRotation());
@@ -253,8 +252,6 @@ public class PathFollow extends CommandBase {
     
     
     chassisPose = chassis.getPose();
-    System.out.println("INDEX: " + pointIndex);
-    System.out.println(isInPoint(chassisPose, points[pointIndex]));
 
     if(isInPoint(chassisPose, points[pointIndex])) pointIndex++;
 
