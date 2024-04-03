@@ -188,8 +188,8 @@ public class PathFollow extends CommandBase {
       segments.add(corners[corners.length - 1].getCtoCurveLeg());
       
     }
-    for (Segment segment : segments) {
-      if(segment.getLength() < PATH_MIN_DISTANCE_SEGMENT) segments.remove(segment);
+    for(int i = 0; i < segments.size(); i++){
+      if(segments.get(i).getLength() < PATH_MIN_DISTANCE_SEGMENT) segments.remove(i);
     }
   }
    
@@ -211,9 +211,12 @@ public class PathFollow extends CommandBase {
     // calculates the length of the entire path
     double segmentSum = 0;
     for (Segment s : segments) {
+      System.out.println("SEGMENT: " + s);
+      System.out.println("CURRENT SEGMENT LENGTH: " + s.getLength());
       segmentSum += s.getLength();
     }
     pathLength = segmentSum;
+    
     totalLeft = pathLength;
     segmentIndex = 0;
 
