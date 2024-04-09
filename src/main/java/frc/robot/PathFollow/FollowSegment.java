@@ -113,8 +113,7 @@ public class FollowSegment extends CommandBase {
     
 
     //calc drive velocity using trapezoid
-    driveVelocity = Math.min(driveTrapezoid.calcVelocity(distanceLeft,
-        currentVelocity.getNorm()), PATH_MAX_VELOCITY);
+    driveVelocity = Math.min(driveTrapezoid.calcVelocity(distanceLeft, currentVelocity.getNorm()), PATH_MAX_VELOCITY);
 
     //calc rotation velocity based on Trapezoid
     double rotationVelocity = (Math.abs(wantedAngle.minus(chassis.getAngle()).getDegrees()) <= PATH_ANGLE_OFFSET)
