@@ -6,7 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.PathFollow.PathFollow;
+import frc.robot.PathFollow.Path;
 import frc.robot.PathFollow.Util.pathPoint;
 
 import frc.robot.subsystems.Chassis;
@@ -40,9 +40,9 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new PathFollow(new pathPoint[]{ new pathPoint(new Translation2d(0, 0), Rotation2d.fromDegrees(0), 0, 4),
-      new pathPoint(new Translation2d(3, 3), Rotation2d.fromDegrees(20), 0.5, 1),
-
+    return new Path(new pathPoint[]{
+      new pathPoint(0, 0, null, 0, 0),
+      new pathPoint(3, 3, Rotation2d.fromDegrees(90), 0.5, 1),
     });
   }
 }
