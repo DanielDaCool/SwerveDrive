@@ -30,6 +30,8 @@ public class Path extends CommandBase{
     pathPoint[] points;
     Segment currentSegment;
 
+    FollowSegment currentFollowSegment;
+
     public Path(pathPoint[] points){
         this.points = points;
         this.chassis = RobotContainer.robotContainer.chassis;
@@ -120,12 +122,17 @@ public class Path extends CommandBase{
     @Override
     public void initialize(){
         init();
-        new FollowSegment(points[0].getVelocity(), points[1].getVelocity(), segments.get(0), points[1].getRotation()).schedule();
+        currentFollowSegment = new FollowSegment(points[0].getVelocity(), points[1].getVelocity(), segments.get(0), points[1].getRotation());
+        currentFollowSegment.schedule();
         currentSegment = segments.get(0);
+        for (Segment segment : segments) {
+          System.out.println(segment);
+        }
 
     }
     @Override
     public void execute(){
+      
         if(segments.size() == 1){
             return;
         }
@@ -133,20 +140,22 @@ public class Path extends CommandBase{
             pointsIndex++;
         }
 
-        if(isFinishedSegment(currentSegment, chassis.getPose().getTranslation())){
+        if(currentFollowSegment.isFinished()){
             segmentIndex++;
             updateCurrentSegment();
-            new FollowSegment(FIELD_LENGTH, FIELD_HEIGHT, currentSegment, points[pointsIndex].getRotation());
+            currentFollowSegment = new FollowSegment(FIELD_LENGTH, FIELD_HEIGHT, currentSegment, points[pointsIndex].getRotation());
+            currentFollowSegment.schedule();
         }
         
     }
     @Override
     public void end(boolean interrupted){
         System.out.println("Ended");
+        chassis.stop();
     }
     @Override
     public boolean isFinished(){
-        return isInPoint(chassis.getPose().getTranslation(), points[points.length - 1].getTranslation());
+      return isInPoint(chassis.getPose().getTranslation(), points[points.length - 1].getTranslation());
     }
     
 }

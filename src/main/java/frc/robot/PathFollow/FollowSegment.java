@@ -106,7 +106,7 @@ public class FollowSegment extends CommandBase {
     // current velocity vector
     Translation2d currentVelocity = chassis.getVelocity();
 
-    distanceLeft -= segment.distancePassed(chassisPose.getTranslation()); // TODO need to fix this problem
+    distanceLeft = segmentLength - segment.distancePassed(chassisPose.getTranslation()); // TODO need to fix this problem
     System.out.println("DISTANCE LEFT: " + distanceLeft);
     
 
@@ -126,10 +126,11 @@ public class FollowSegment extends CommandBase {
     chassis.setVelocity(speed);
 
   }
+
   
   @Override
   public boolean isFinished(){
-    return distanceLeft <= 0.15;
+    return distanceLeft <= PATH_DISTANCE_OFFSET;
 
   }
 

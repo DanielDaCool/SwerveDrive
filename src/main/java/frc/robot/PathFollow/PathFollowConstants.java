@@ -28,9 +28,6 @@ public class PathFollowConstants {
         return pos.getDistance(point) <= 0.05;
     }
 
-    public static boolean isFinishedSegment(Segment segment, Translation2d pos){
-        return segment.distancePassed(pos) >= segment.getLength() - PATH_DISTANCE_OFFSET;
-    }
  
 
 }
