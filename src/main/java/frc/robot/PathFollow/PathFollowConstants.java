@@ -26,7 +26,7 @@ public class PathFollowConstants {
     }
 
     public static enum TimeOfCommand{
-        INIT, ALONG_WITH, END
+        ALONG_WITH, END
     }
 
  

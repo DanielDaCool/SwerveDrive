@@ -156,9 +156,7 @@ public class Path extends CommandBase{
         else currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), 0, currentSegment,
          points[pointsIndex].getRotation(), points[pointsIndex].getCommand(), points[pointsIndex].getTimeOfCommand());
         
-        if(timeOfCurrentCommand == TimeOfCommand.ALONG_WITH) currentFollowSegment.alongWith(currentCommand).schedule();
-        else currentFollowSegment.schedule();
-        
+        currentFollowSegment.schedule();
       }
         
     }

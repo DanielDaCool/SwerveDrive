@@ -69,7 +69,7 @@ public class FollowSegment extends CommandBase {
   
   @Override
   public void initialize() {
-    if(timeOfCommand == TimeOfCommand.INIT) command.schedule();
+    if(timeOfCommand == TimeOfCommand.ALONG_WITH) command.schedule();
 
 
     driveTrapezoid = new Trapezoid(wantedVel, accel, nextVel);
