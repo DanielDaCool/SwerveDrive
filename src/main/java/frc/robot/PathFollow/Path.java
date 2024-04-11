@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.PathFollow.Util.Leg;
@@ -13,6 +14,8 @@ import frc.robot.PathFollow.Util.Segment;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.subsystems.Chassis;
 import static frc.robot.PathFollow.PathFollowConstants.*;
+
+
 
 public class Path extends CommandBase{
     Chassis chassis;
@@ -28,7 +31,8 @@ public class Path extends CommandBase{
     Segment currentSegment;
 
     FollowSegment currentFollowSegment;
-    CommandInPos current;
+    Command currentCommand;
+    TimeOfCommand timeOfCurrentCommand;
 
     public Path(pathPoint[] points){
         this.points = points;
@@ -44,16 +48,16 @@ public class Path extends CommandBase{
         isRed = RobotContainer.robotContainer.isRed();
         // sets first point to chassis pose to prevent bugs with red and blue alliance
         points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(), points[1].getRotation(),
-            points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommandInPos());
+            points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommand(), points[0].getTimeOfCommand());
     
         // case for red alliance (blue is the default)
         if (isRed) {
           points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(),
-              Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommandInPos());
+              Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommand(), points[0].getTimeOfCommand());
           for (int i = 1; i < points.length; i++) {
             points[i] = new pathPoint(convertAlliance(points[i].getX()), points[i].getY(),
                 Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
-                points[i].getRadius(), points[i].getVelocity(), points[i].getCommandInPos());
+                points[i].getRadius(), points[i].getVelocity(), points[i].getCommand(), points[i].getTimeOfCommand());
                 
           }
         }
@@ -119,43 +123,43 @@ public class Path extends CommandBase{
     }
 
     private void updateCurrentSegment(){
-        currentSegment = segments.get(segmentIndex);
+      currentSegment = segments.get(segmentIndex);
     }
    
     @Override
     public void initialize(){
         init();
         currentFollowSegment = new FollowSegment(points[0].getVelocity(), points[1].getVelocity(),
-         segments.get(0), points[1].getRotation(), points[0].getCommandInPos());
+         segments.get(0), points[1].getRotation(), points[0].getCommand(), points[0].getTimeOfCommand());
         currentFollowSegment.schedule();
         currentSegment = segments.get(0);
-        current = points[0].getCommandInPos();
+        currentCommand = points[0].getCommand();
     }
     @Override
     public void execute(){
       if(segments.size() == 1){
-          return;
+        return;
       }
       if(isInPoint(chassis.getPose().getTranslation(), points[pointsIndex].getTranslation())){
-
         pointsIndex++;
-        System.out.println("New point index: " + pointsIndex);
       }
+      timeOfCurrentCommand = points[pointsIndex].getTimeOfCommand();
         
 
       if(currentFollowSegment.isFinished()){
         segmentIndex++;
-        System.out.println(pointsIndex);
         updateCurrentSegment();
         if(!isLastPoint()){
           currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), points[pointsIndex + 1].getVelocity(), currentSegment,
-            points[pointsIndex].getRotation(), points[pointsIndex].getCommandInPos());
+            points[pointsIndex].getRotation(), points[pointsIndex].getCommand(), points[pointsIndex].getTimeOfCommand());
         }
-        else currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), 0, currentSegment, points[pointsIndex].getRotation(), points[pointsIndex].getCommandInPos());
-        currentFollowSegment.schedule();
-        current = points[pointsIndex].getCommandInPos();
+        else currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), 0, currentSegment,
+         points[pointsIndex].getRotation(), points[pointsIndex].getCommand(), points[pointsIndex].getTimeOfCommand());
+        
+        if(timeOfCurrentCommand == TimeOfCommand.ALONG_WITH) currentFollowSegment.alongWith(currentCommand).schedule();
+        else currentFollowSegment.schedule();
+        
       }
-      System.out.println("Current command: " + current);
         
     }
     @Override

@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.PathFollow.CommandInPos;
 import frc.robot.PathFollow.Path;
 import frc.robot.PathFollow.Util.pathPoint;
 import frc.robot.subsystems.Chassis;
@@ -43,10 +42,14 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
+    /*return new Path(new pathPoint[]{
+      new pathPoint(0, 0, null, 0, 0.5),
+      new pathPoint(3, 3, Rotation2d.fromDegrees(90), 0.5, 1),
+      new pathPoint(6, 0, Rotation2d.fromDegrees(180), 0, 2)
+    });*/
     return new Path(new pathPoint[]{
-      new pathPoint(0, 0, null, 0, 0, new CommandInPos(new Translation2d(1, 1), new InstantCommand(() -> System.out.println("First command")))),
-      new pathPoint(3, 3, Rotation2d.fromDegrees(90), 0.5, 3, new CommandInPos(new Translation2d(3, 3), new InstantCommand(() -> System.out.println("Second command")))),
-      new pathPoint(6, 0, Rotation2d.fromDegrees(180), 0, 2, new CommandInPos(new Translation2d(5, 0), new InstantCommand(() -> System.out.println("Third command"))))
+      new pathPoint(0, 0, null, 0, 0),
+      new pathPoint(6, 6, Rotation2d.fromDegrees(0), 0, 2)
     });
   }
 }
