@@ -32,7 +32,7 @@ public class Path extends CommandBase{
 
     FollowSegment currentFollowSegment;
     Command currentCommand;
-    TimeOfCommand timeOfCurrentCommand;
+    boolean waitUntilCommandIsFinished;
 
     public Path(pathPoint[] points){
         this.points = points;
@@ -40,6 +40,8 @@ public class Path extends CommandBase{
         segmentIndex = 0;
         pointsIndex = 0;
         addRequirements(chassis);
+        waitUntilCommandIsFinished = false;
+
     }
 
 
@@ -53,11 +55,11 @@ public class Path extends CommandBase{
         // case for red alliance (blue is the default)
         if (isRed) {
           points[0] = new pathPoint(chassis.getPose().getX(), chassis.getPose().getY(),
-              Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommand(), points[0].getTimeOfCommand(), points[0].getWaitStatus());
+              Rotation2d.fromDegrees(180).minus(points[1].getRotation()), points[0].getRadius(), chassis.getVelocity().getNorm(), points[0].getCommand(), points[0].getWaitStatus());
           for (int i = 1; i < points.length; i++) {
             points[i] = new pathPoint(convertAlliance(points[i].getX()), points[i].getY(),
                 Rotation2d.fromDegrees(180).minus(points[i].getRotation()),
-                points[i].getRadius(), points[i].getVelocity(), points[i].getCommand(), points[i].getTimeOfCommand(), points[i].getWaitStatus());
+                points[i].getRadius(), points[i].getVelocity(), points[i].getCommand(), points[i].getWaitStatus());
                 
           }
         }
@@ -124,14 +126,33 @@ public class Path extends CommandBase{
     private void initFirstSegment(){
       currentFollowSegment = new FollowSegment(points[0].getVelocity(), points[1].getVelocity(),
       segments.get(0), points[1].getRotation());
-      currentFollowSegment.schedule();
       currentSegment = segments.get(0);
       currentCommand = points[0].getCommand();
+      try{
+        if(points[0].getWaitStatus()) currentFollowSegment.alongWith(currentCommand).schedule();
+      
+        else {
+          currentCommand.schedule();
+          currentFollowSegment.schedule();
+        }
+
+      }
+      catch(Exception e){
+        System.out.println("No command found");
+        currentFollowSegment.schedule();
+      }
+      
+      
 
     }
 
     private void updateCurrentSegment(){
       currentSegment = segments.get(segmentIndex);
+    }
+    private void updateCurrentCommandAndTime(){
+      currentCommand = points[pointsIndex].getCommand();
+      waitUntilCommandIsFinished = points[pointsIndex].getWaitStatus();
+      
     }
    
     @Override
@@ -147,14 +168,9 @@ public class Path extends CommandBase{
       if(segments.size() == 1){
         return;
       }
-      if(isInPoint(chassis.getPose().getTranslation(), points[pointsIndex].getTranslation())){
+      if(isInPoint(chassis.getPose().getTranslation(), points[pointsIndex].getTranslation()) && !isLastPoint()){
         pointsIndex++;
-      }
-      try{
-        timeOfCurrentCommand = points[pointsIndex].getTimeOfCommand();
-      }
-      catch (Exception e){
-        System.out.println("there was a problem: " + e);
+        updateCurrentCommandAndTime();
       }
       
         
@@ -163,13 +179,27 @@ public class Path extends CommandBase{
         segmentIndex++;
         updateCurrentSegment();
         if(!isLastPoint()){
+
           currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), points[pointsIndex + 1].getVelocity(), currentSegment,
             points[pointsIndex].getRotation());
         }
-        else currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), 0, currentSegment,
-         points[pointsIndex].getRotation());
+        else{
+          currentFollowSegment = new FollowSegment(points[pointsIndex].getVelocity(), 0, currentSegment, points[pointsIndex].getRotation());
         
-        currentFollowSegment.schedule();
+        }
+        try{
+          if(waitUntilCommandIsFinished) currentFollowSegment.alongWith(currentCommand).schedule();
+          else{
+            currentCommand.schedule();
+            currentFollowSegment.schedule();
+          }
+        }
+        catch(Exception e){
+          System.out.println("No command found");
+          currentFollowSegment.schedule();
+        }
+        
+        
       }
         
     }
