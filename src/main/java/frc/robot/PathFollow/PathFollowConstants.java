@@ -7,8 +7,8 @@ public class PathFollowConstants {
     public static double ROBOT_LENGTH = 0.50; //TODO
     public static double PATH_ANGLE_OFFSET = 3;
     public static double PATH_DISTANCE_OFFSET = 0.01;
-    public static double PATH_MAX_VELOCITY = 3;
-    public static double PATH_ACCEL = 2;
+    public static double PATH_MAX_VELOCITY = 4;
+    public static double PATH_ACCEL = 10;
     public static double PATH_ROTATION_MAX_VELOCITY = Math.PI;
     public static double PATH_ROTATION_ACCEL = Math.PI * 2;
     public static double PATH_MIN_DISTANCE_FROM_CORNER = (ROBOT_LENGTH / 2) + 0.6; //in CM

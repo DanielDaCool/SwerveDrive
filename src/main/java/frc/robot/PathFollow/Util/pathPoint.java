@@ -20,35 +20,41 @@ public class pathPoint extends Pose2d{
     double velocity;
     Command command;
     TimeOfCommand timeOfCommand;
+    boolean waitUntilCommandIsFinished;
 
     public pathPoint(Translation2d p, Rotation2d r, double velocity) {
       this(p.getX(),p.getY(),r,0, velocity);
+      this.waitUntilCommandIsFinished = false;
     }
     public pathPoint(Translation2d p, Rotation2d r, double radius, double velocity) {
       this(p.getX(),p.getY(),r,radius, velocity);
+      this.waitUntilCommandIsFinished = false;
     }
 
     public pathPoint(double x, double y, Rotation2d rotation, double radius, double velocity) {
         super(x,y,rotation);
         this.radius = radius;
         this.velocity = velocity;
+        this.waitUntilCommandIsFinished = false;
       
     }
 
 
-    public pathPoint(Translation2d t, Rotation2d rotation, double radius, double velocity, Command command, TimeOfCommand timeOfCommand) {
+    public pathPoint(Translation2d t, Rotation2d rotation, double radius, double velocity, Command command, TimeOfCommand timeOfCommand, boolean waitUntilCommandIsFinished) {
       super(t.getX(), t.getY(),rotation);
       this.radius = radius;
       this.velocity = velocity;
       this.command = command;
       this.timeOfCommand = timeOfCommand;
+      this.waitUntilCommandIsFinished = waitUntilCommandIsFinished;
     }
-    public pathPoint(double x, double y, Rotation2d rotation, double radius, double velocity, Command command, TimeOfCommand timeOfCommand) {
+    public pathPoint(double x, double y, Rotation2d rotation, double radius, double velocity, Command command, TimeOfCommand timeOfCommand, boolean waitUntilCommandIsFinished) {
       super(x, y, rotation);
       this.radius = radius;
       this.velocity = velocity;
       this.command = command;
       this.timeOfCommand = timeOfCommand;
+      this.waitUntilCommandIsFinished = waitUntilCommandIsFinished;
     }
     
     public double getRadius()
@@ -73,6 +79,14 @@ public class pathPoint extends Pose2d{
     }
     public TimeOfCommand getTimeOfCommand(){
       return timeOfCommand;
+    }
+    public boolean getWaitStatus(){
+      return waitUntilCommandIsFinished;
+    }
+    
+    @Override
+    public String toString(){
+      return "x: " + this.getX() + " y: " + this.getY() + " radius: " + this.getRadius() + " velocity: " + this.getVelocity();
     }
 
 

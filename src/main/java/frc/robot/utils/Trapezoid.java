@@ -2,12 +2,19 @@
 package frc.robot.utils;
 import static frc.robot.Constants.*;
 
+
+
 public class Trapezoid {
     private double maxVel;
     private double accel;
     private double lastVel;
     private double finishVel;
     private double deltaVelocity;
+
+    public enum TrapezoidState{
+        ACCEL, DEACCEL, KEEP
+    }
+    public TrapezoidState currentState;
 
 
     public Trapezoid(double maxVel, double accel, double finishVel){
@@ -37,8 +44,15 @@ public class Trapezoid {
             return -calcVelocity(Math.abs(distanceLeft), currentVel);
         }
 
-        return (isAbleToDeAccel(currentVel, distanceLeft))
-        ? Math.min(currentVel + deltaVelocity, maxVel)
-        : Math.max(currentVel - deltaVelocity, finishVel);
+        if(isAbleToDeAccel(currentVel + deltaVelocity, distanceLeft)){
+            currentState = (currentVel >= maxVel) ? TrapezoidState.KEEP : TrapezoidState.ACCEL;
+            return Math.min(currentVel + deltaVelocity, maxVel);
+
+        }
+        else{
+            currentState = TrapezoidState.DEACCEL;
+            return Math.max(currentVel - deltaVelocity, finishVel);
+        }
     }
+    public TrapezoidState getState(){ return currentState;}
 }
