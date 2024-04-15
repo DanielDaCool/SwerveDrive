@@ -37,9 +37,6 @@ public class FollowSegment extends CommandBase {
 
   Translation2d vecVel;
 
-  Command command;
-
-
 
 
   /**
@@ -53,14 +50,15 @@ public class FollowSegment extends CommandBase {
 
 
 
-   public FollowSegment(double wantedVel, double nextVel, Segment segment, Rotation2d wantedAngle, Command command){
+   public FollowSegment(double wantedVel, double nextVel, Segment segment, Rotation2d wantedAngle){
     this.wantedVel = wantedVel;
     this.nextVel = nextVel;
     this.accel = PATH_ACCEL;
     this.segment = segment;
     this.wantedAngle = wantedAngle;
     this.chassis = RobotContainer.robotContainer.chassis;
-    this.command = command;
+    addRequirements(chassis);
+
    }
 
  
@@ -72,7 +70,6 @@ public class FollowSegment extends CommandBase {
 
     driveTrapezoid = new Trapezoid(wantedVel, accel, nextVel);
     rotationTrapezoid = new Trapezoid(PATH_ROTATION_MAX_VELOCITY, PATH_ROTATION_ACCEL, 0);
-
 
 
     segmentLength = segment.getLength();
@@ -105,13 +102,10 @@ public class FollowSegment extends CommandBase {
     //calc drive velocity using trapezoid
     driveVelocity = Math.min(driveTrapezoid.calcVelocity(distanceLeft, currentVelocity.getNorm()), PATH_MAX_VELOCITY);
 
-
-
     //calc rotation velocity based on Trapezoid
     double rotationVelocity = (Math.abs(wantedAngle.minus(chassis.getAngle()).getDegrees()) <= PATH_ANGLE_OFFSET)
       ? 0 : rotationTrapezoid.calcVelocity(chassis.getChassisSpeeds().omegaRadiansPerSecond, wantedAngle.minus(chassis.getAngle()).getRadians());
 
-    
     //vector of the velocity
     Translation2d velVector = segment.calc(chassisPose.getTranslation(), driveVelocity);
 
@@ -120,6 +114,10 @@ public class FollowSegment extends CommandBase {
 
   }
 
+  @Override
+  public void end(boolean interrupted) {
+
+  }
   
   @Override
   public boolean isFinished(){
